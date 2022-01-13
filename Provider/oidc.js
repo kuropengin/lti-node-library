@@ -36,7 +36,7 @@ function create_oidc_response(req, res) {
   //Save the OIDC Login Request to reference later during current session
   req.session.login_request = req.body;
 
-  Database.Get('platforms', platformSchema, {  consumerUrl: req.session.login_request.iss ,consumerToolClientID: req.session.login_request.client_id })
+  Database.Get('platforms', platformSchema, { consumerUrl: req.session.login_request.iss ,consumerToolClientID: req.session.login_request.client_id })
   .then(dbResult => {
 
     if (dbResult.length >= 1) return dbResult[0]
