@@ -37,14 +37,17 @@ const registerPlatform = async (
   let existingPlatform;
 
   //checks database for existing platform.
-  await Database.Get('platforms', platformSchema,{ 'consumerUrl': consumerUrl })
-  .then( (registeringPlatform) => {
+  await Database.Get('platforms', platformSchema,{
+    'consumerUrl': consumerUrl,
+    'consumerToolClientID': consumerToolClientID
+  })
+  .then( async (registeringPlatform) => {
     if (typeof registeringPlatform === 'undefined' || registeringPlatform.length === 0) {
     
       const keyPairs = keyGenerator();
   
       // creates/inserts platform data into database.
-      Database.Insert('platforms', platformSchema, { 
+      const regPlatform = await Database.Insert('platforms', platformSchema, { 
         'consumerUrl': consumerUrl,
         'consumerName': consumerName,
         'consumerToolClientID': consumerToolClientID,
@@ -54,10 +57,15 @@ const registerPlatform = async (
         'kid': keyPairs,
         'consumerAuthorizationconfig': consumerAuthorizationconfig,
       });
-      return console.log(`Platform registered at: ${consumerUrl}`);
+      if(regPlatform){
+        console.log(`Platform registered at: ${consumerUrl}`);
+      }
+      else{
+        console.log(`Platform registration failed at: ${consumerUrl}`);
+      }
+      existingPlatform = regPlatform;
     } else {
-      existingPlatform = registeringPlatform;
-      return existingPlatform;
+      existingPlatform = registeringPlatform[0];
     };
 })
   .catch(err => console.log(`Error finding platform: ${err}`));

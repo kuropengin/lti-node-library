@@ -29,12 +29,19 @@ class Database {
     return publicKey;
   }
 
-  static Insert(collection, platformSchema, platform) {
+  static async Insert(collection, platformSchema, platform) {
     let Model = mongoose.model(collection, platformSchema);
+    let savedPlatform;
 
     let newPlatform = new Model(platform);
-    newPlatform.save();
-    return true;
+    await newPlatform.save()
+    .then(key => {
+      savedPlatform = key;
+    })
+    .catch(err => {
+      savedPlatform = false;
+    });
+    return savedPlatform;
   };
 
 };
